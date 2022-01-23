@@ -1,13 +1,12 @@
-const Index = () => {
+const Login = () => {
   return (
     <>
+      {" "}
       <h1 className="jumbotron d-flex justify-content-center align-items-center text-white">
-        Online Education Marketplace{" "}
+        Login
       </h1>
-
-      <p>From NextJs</p>
     </>
   );
 };
 
-export default Index;
+export default Login;
