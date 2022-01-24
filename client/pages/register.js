@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 
 const Register = () => {
@@ -12,10 +13,15 @@ const Register = () => {
     setFormValues({ ...formValues, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("submitted");
     console.table({ formValues });
+
+    const { data } = await axios.post(`http://localhost:5000/api/register`, {
+      formValues,
+    });
+    console.log("register response", data);
 
     setFormValues({
       name: "",
