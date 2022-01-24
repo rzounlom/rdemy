@@ -5,7 +5,7 @@ import User from "../db/models/user";
 export const register = async (req, res) => {
   try {
     console.log(req.body);
-    const { name, email, password } = req.body.formValues;
+    const { name, email, password } = req.body;
 
     //validate data
     if (!name) return res.status(400).send("name is required");

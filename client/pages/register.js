@@ -1,6 +1,8 @@
+import React, { useState } from "react";
+
+import { SyncOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useState } from "react";
 
 const Register = () => {
   const [formValues, setFormValues] = useState({
@@ -8,6 +10,9 @@ const Register = () => {
     email: "",
     password: "",
   });
+
+  const [loading, setLoading] = useState(false);
+  const { name, email, password } = formValues;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,10 +23,12 @@ const Register = () => {
     event.preventDefault();
 
     try {
+      setLoading(true);
       const { data } = await axios.post(`http://localhost:5000/api/register`, {
-        formValues,
+        name,
+        email,
+        password,
       });
-      console.log("register response", data);
 
       setFormValues({
         name: "",
@@ -30,6 +37,7 @@ const Register = () => {
       });
 
       toast.success("User successfully created");
+      setLoading(false);
     } catch (error) {
       console.log(error);
 
@@ -40,6 +48,7 @@ const Register = () => {
       });
 
       toast.error(error.response.data);
+      setLoading(false);
     }
   };
 
@@ -56,7 +65,7 @@ const Register = () => {
             type="text"
             className="form-control mb-4 p-4"
             placeholder="Enter name"
-            value={formValues.name}
+            value={name}
             onChange={handleInputChange}
             required
           />
@@ -66,7 +75,7 @@ const Register = () => {
             type="email"
             className="form-control mb-4 p-4"
             placeholder="Enter email"
-            value={formValues.email}
+            value={email}
             onChange={handleInputChange}
             required
           />
@@ -76,13 +85,17 @@ const Register = () => {
             type="password"
             className="form-control mb-4 p-4"
             placeholder="Enter password"
-            value={formValues.password}
+            value={password}
             onChange={handleInputChange}
             required
           />
 
-          <button type="submit" className="btn btn-block btn-primary">
-            Submit
+          <button
+            type="submit"
+            className="btn btn-block btn-primary"
+            disabled={!name || !email || !password}
+          >
+            {loading ? <SyncOutlined spin /> : "Submit"}
           </button>
         </form>
       </div>
