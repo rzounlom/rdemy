@@ -1,6 +1,7 @@
 import { comparePassword, hashPassword } from "../utils/auth";
 
 import User from "../db/models/user";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   try {
@@ -33,5 +34,44 @@ export const register = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(400).send("Error.  Try again");
+  }
+};
+
+export const login = async (req, res) => {
+  try {
+    // console.log("request body: ", req.body);
+    //find user with email
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) return res.status(400).send("No user  found");
+
+    //comopare sent password with db password for user
+    const match = await comparePassword(password, user.password);
+
+    //create signed jwt
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    //return user and token to client, exclude password
+    if (match) {
+      //send token in cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        // secure: true, //only works on https
+      });
+
+      //set user password to undef
+      user.password = undefined;
+
+      //return user as json response
+      res.json(user);
+    } else {
+      res.status(400).send("Invalid credentials");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("Error. Try again.");
   }
 };
