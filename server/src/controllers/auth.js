@@ -47,7 +47,7 @@ export const login = async (req, res) => {
     if (!user) return res.status(400).send("No user  found");
 
     //comopare sent password with db password for user
-    const match = await comparePassword(password, user.password);
+    const match = comparePassword(password, user.password);
 
     //create signed jwt
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
