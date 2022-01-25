@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
+import { Context } from "../context";
 import Link from "next/link";
 import { SyncOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const Login = () => {
   const [formValues, setFormValues] = useState({
@@ -13,6 +15,11 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
   const { email, password } = formValues;
+
+  //state
+  const { state, dispatch } = useContext(Context);
+
+  const router = useRouter();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,6 +36,14 @@ const Login = () => {
         password,
       });
 
+      dispatch({
+        type: "LOGIN",
+        payload: data,
+      });
+
+      //save in localStorage
+      window.localStorage.setItem("user", JSON.stringify(data));
+      router.push("/");
       setFormValues({
         email: "",
         password: "",
