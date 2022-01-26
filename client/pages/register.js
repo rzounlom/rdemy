@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
+import { Context } from "../context";
 import Link from "next/link";
 import { SyncOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const Register = () => {
+  const router = useRouter();
+  const {
+    state: { user },
+    dispatch,
+  } = useContext(Context);
   const [formValues, setFormValues] = useState({
     name: "",
     email: "",
@@ -52,6 +59,12 @@ const Register = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user]);
 
   return (
     <>

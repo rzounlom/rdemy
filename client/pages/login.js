@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { Context } from "../context";
 import Link from "next/link";
@@ -17,7 +17,10 @@ const Login = () => {
   const { email, password } = formValues;
 
   //state
-  const { state, dispatch } = useContext(Context);
+  const {
+    state: { user },
+    dispatch,
+  } = useContext(Context);
 
   const router = useRouter();
 
@@ -63,6 +66,12 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user]);
 
   return (
     <>
