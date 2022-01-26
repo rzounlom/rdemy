@@ -17,13 +17,14 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
-app.use(csrfProtection);
 
 //route
 readdirSync("./src/routes").map((r) =>
   app.use("/api", require(`./routes/${r}`))
 );
 
+//use csrfProtection only before calling the api/csrf-token route for post requests
+app.use(csrfProtection);
 app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });

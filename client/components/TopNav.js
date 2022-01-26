@@ -6,6 +6,7 @@ import {
   LoginOutlined,
   LogoutOutlined,
   UserAddOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { useContext, useEffect, useState } from "react";
 
@@ -16,7 +17,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 
-const { Item, SubMenu } = Menu;
+const { Item, SubMenu, ItemGroup } = Menu;
 
 const TopNav = () => {
   const [current, setCurrent] = useState("");
@@ -41,12 +42,17 @@ const TopNav = () => {
   };
 
   return (
-    <Menu mode="horizontal" selectedKeys={[current]}>
-      <>
+    <Menu
+      className="d-flex justify-content-between align-items-center"
+      mode="horizontal"
+      selectedKeys={[current]}
+    >
+      <div className="d-flex justify-content-evenly align-items-center">
         <Item
           key="/"
           icon={<AppstoreOutlined />}
           onClick={(e) => setCurrent(e.key)}
+          className="d-flex align-items-center"
         >
           <Link href="/">
             <a>App</a>
@@ -69,6 +75,7 @@ const TopNav = () => {
               key="/register"
               icon={<UserAddOutlined />}
               onClick={(e) => setCurrent(e.key)}
+              className="d-flex align-items-center"
             >
               <Link href="/register">
                 <a>Register</a>
@@ -76,23 +83,32 @@ const TopNav = () => {
             </Item>
           </>
         )}
-      </>
+      </div>
 
       {user && (
-        <SubMenu
-          icon={<CoffeeOutlined />}
-          title={user && user.name}
-          className="float-right"
-        >
-          <Item
-            icon={<LogoutOutlined />}
-            key={4}
-            onClick={logout}
-            className="float-right"
-          >
-            Logout
-          </Item>
-        </SubMenu>
+        <>
+          <SubMenu icon={<CoffeeOutlined />} title={user && user.name}>
+            <ItemGroup>
+              <Item
+                className="d-flex align-items-center"
+                key="/user"
+                icon={<UserOutlined />}
+              >
+                <Link href="/user">
+                  <a>Dashboard</a>
+                </Link>
+              </Item>
+              <Item
+                className="d-flex align-items-center"
+                icon={<LogoutOutlined />}
+                key={4}
+                onClick={logout}
+              >
+                Logout
+              </Item>
+            </ItemGroup>
+          </SubMenu>
+        </>
       )}
     </Menu>
   );

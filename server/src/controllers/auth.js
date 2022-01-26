@@ -38,6 +38,7 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  console.log("JWT_SECRET", process.env.JWT_SECRET);
   try {
     // console.log("request body: ", req.body);
     //find user with email
@@ -84,5 +85,15 @@ export const logout = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).send("Error. Try Again");
+  }
+};
+
+export const currentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password").exec();
+    console.log("CURRENT_USER", user);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
   }
 };
