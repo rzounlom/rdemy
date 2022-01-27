@@ -44,7 +44,15 @@ const Register = () => {
         password: "",
       });
 
-      toast.success("User successfully created");
+      toast.success("Registration Successfull");
+      dispatch({
+        type: "LOGIN",
+        payload: data,
+      });
+
+      //save in localStorage
+      window.localStorage.setItem("user", JSON.stringify(data));
+      router.push("/");
       setLoading(false);
     } catch (error) {
       console.log(error);

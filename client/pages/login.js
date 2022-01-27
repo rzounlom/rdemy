@@ -52,7 +52,7 @@ const Login = () => {
         password: "",
       });
 
-      console.log("LOGIN RESPONSE: ", data);
+      // console.log("LOGIN RESPONSE: ", data);
       setLoading(false);
     } catch (error) {
       console.log(error);

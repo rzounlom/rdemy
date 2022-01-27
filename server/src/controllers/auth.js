@@ -30,7 +30,21 @@ export const register = async (req, res) => {
 
     await user.save();
 
-    return res.json({ ok: true });
+    //create token
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    //create cookie with token
+    res.cookie("token", token, {
+      httpOnly: true,
+      // secure: true, //only works on https
+    });
+    //set user password to undef
+    user.password = undefined;
+
+    //return user as json response
+    res.json(user);
   } catch (err) {
     console.log(err);
     return res.status(400).send("Error.  Try again");
@@ -91,7 +105,7 @@ export const logout = async (req, res) => {
 export const currentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password").exec();
-    console.log("CURRENT_USER", user);
+    // console.log("CURRENT_USER", user);
     return res.json({ ok: true });
   } catch (err) {
     console.log(err);
