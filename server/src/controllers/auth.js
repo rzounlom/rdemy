@@ -79,21 +79,22 @@ export const login = async (req, res) => {
     });
 
     //return user and token to client, exclude password
-    if (match) {
-      //send token in cookie
-      res.cookie("token", token, {
-        httpOnly: true,
-        // secure: true, //only works on https
-      });
 
-      //set user password to undef
-      user.password = undefined;
-
-      //return user as json response
-      res.json(user);
-    } else {
-      res.status(400).send("Invalid credentials");
+    if (!match) {
+      return res.status(400).send("Invalid credentials");
     }
+
+    //send token in cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      // secure: true, //only works on https
+    });
+
+    //set user password to undef
+    user.password = undefined;
+
+    //return user as json response
+    res.json(user);
   } catch (error) {
     console.log(error);
     res.status(400).send("Error. Try again.");
