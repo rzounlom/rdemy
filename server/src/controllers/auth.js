@@ -3,6 +3,7 @@ import { comparePassword, hashPassword } from "../utils/auth";
 import AWS from "aws-sdk";
 import User from "../db/models/user";
 import jwt from "jsonwebtoken";
+import { nanoid } from "nanoid";
 
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -153,4 +154,67 @@ export const sendTestEmail = async (req, res) => {
   emailSent
     .then((data) => console.log(data))
     .catch((e) => console.log("error: ", e));
+};
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  // console.log(email);
+
+  //check if user exists
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(400).send("Email not found");
+  }
+
+  //create code and add to user model
+  const shortCode = nanoid(6).toUpperCase();
+
+  user.passwordResetCode = shortCode;
+
+  await user.save();
+  console.log("User: ", user);
+
+  //prepare email
+  const params = {
+    Source: process.env.EMAIL_FROM,
+    Destination: {
+      ToAddresses: [email],
+    },
+    ReplyToAddresses: [process.env.EMAIL_FROM],
+    Message: {
+      Body: {
+        Html: {
+          Charset: "UTF-8",
+          Data: `
+          <html>
+          <h1>Reset Password</h1>
+          <p>User this code to reset your password</p>
+          <h2 style="color:red;">${shortCode}</h2>
+          <i>rdemy.com</i>
+          </html>
+          `,
+        },
+      },
+      Subject: {
+        Charset: "UTF-8",
+        Data: "Reset Password<",
+      },
+    },
+  };
+
+  try {
+    const emailSent = SES.sendEmail(params).promise();
+
+    emailSent
+      .then((data) => console.log(data))
+      .catch((e) => console.log("error: ", e));
+
+    console.log("Email response: ", emailSent);
+
+    res.json({ ok: true });
+  } catch (error) {
+    console.log(error);
+    res.staus(400).send("Error. Try again.");
+  }
 };
