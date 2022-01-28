@@ -1,7 +1,17 @@
 import { comparePassword, hashPassword } from "../utils/auth";
 
+import AWS from "aws-sdk";
 import User from "../db/models/user";
 import jwt from "jsonwebtoken";
+
+const awsConfig = {
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+  apiVersion: process.env.AWS_API_VERSION,
+};
+
+const SES = new AWS.SES();
 
 export const register = async (req, res) => {
   try {
@@ -110,4 +120,37 @@ export const currentUser = async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+export const sendTestEmail = async (req, res) => {
+  const params = {
+    Source: process.env.EMAIL_FROM,
+    Destination: {
+      ToAddresses: ["firstshiftmedia@gmail.com"],
+    },
+    ReplyToAddresses: [process.env.EMAIL_FROM],
+    Message: {
+      Body: {
+        Html: {
+          Charset: "UTF-8",
+          Data: `
+            <html>
+            <h1>Reset Password Link</h1>
+            <p>Please use the following link to  reset your password</p>
+            </html>
+            `,
+        },
+      },
+      Subject: {
+        Charset: "UTF-8",
+        Data: "Password Reset Link",
+      },
+    },
+  };
+
+  const emailSent = SES.sendEmail(params).promise();
+
+  emailSent
+    .then((data) => console.log(data))
+    .catch((e) => console.log("error: ", e));
 };
