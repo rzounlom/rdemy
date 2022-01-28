@@ -69,6 +69,9 @@ const ForgotPassword = () => {
       setCode("");
       setNewPassword("");
       setConfirmNewPassword("");
+      setSuccess(false);
+      toast.success("Password successfully reset");
+      router.push("/login");
     } catch (error) {
       setLoading(false);
       console.log(error);

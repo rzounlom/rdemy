@@ -56,16 +56,14 @@ export const register = async (req, res) => {
 
     //return user as json response
     res.json(user);
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
     return res.status(400).send("Error.  Try again");
   }
 };
 
 export const login = async (req, res) => {
-  console.log("JWT_SECRET", process.env.JWT_SECRET);
   try {
-    // console.log("request body: ", req.body);
     //find user with email
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -116,10 +114,9 @@ export const logout = async (req, res) => {
 export const currentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password").exec();
-    // console.log("CURRENT_USER", user);
     return res.json({ ok: true });
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -158,7 +155,6 @@ export const sendTestEmail = async (req, res) => {
 
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
-  // console.log(email);
 
   //check if user exists
   const user = await User.findOne({ email });
@@ -173,7 +169,6 @@ export const forgotPassword = async (req, res) => {
   user.passwordResetCode = shortCode;
 
   await user.save();
-  console.log("User: ", user);
 
   //prepare email
   const params = {
@@ -210,11 +205,38 @@ export const forgotPassword = async (req, res) => {
       .then((data) => console.log(data))
       .catch((e) => console.log("error: ", e));
 
-    console.log("Email response: ", emailSent);
-
     res.json({ ok: true });
   } catch (error) {
     console.log(error);
     res.staus(400).send("Error. Try again.");
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { code, email, newPassword } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(4000).send("User not  found");
+  }
+
+  if (code !== user.passwordResetCode) {
+    return res.status(400).send("Invalid Code. Please try again.");
+  }
+
+  //hash  password
+  const hashedPassword = await hashPassword(newPassword);
+
+  user.password = hashedPassword;
+  user.passwordResetCode = "";
+
+  await user.save();
+
+  res.json({ ok: true });
+  try {
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send("Error. Try again");
   }
 };
